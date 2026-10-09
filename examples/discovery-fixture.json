@@ -1,0 +1,45 @@
+{
+  "packages": [
+    {
+      "ecosystem": "PyPI",
+      "name": "demo-only-package",
+      "version": "1.0.0"
+    }
+  ],
+  "advisories": [
+    {
+      "id": "LOCAL-DEMO-001",
+      "affected": [
+        {
+          "package": {
+            "ecosystem": "PyPI",
+            "name": "demo-only-package"
+          },
+          "versions": [
+            "1.0.0"
+          ]
+        }
+      ]
+    }
+  ],
+  "tls_observations": [
+    {
+      "id": "lab-gateway",
+      "verified": false,
+      "redirect_http_to_https": false,
+      "hsts": false,
+      "min_tls": "TLSv1.1",
+      "source": "synthetic"
+    }
+  ],
+  "ssh_configurations": [
+    {
+      "id": "lab-host",
+      "options": {
+        "PermitRootLogin": "yes",
+        "PasswordAuthentication": "yes",
+        "AllowTcpForwarding": "yes"
+      }
+    }
+  ]
+}
