@@ -1,0 +1,25 @@
+{
+  "schema_version": "cyber-defense/ai-hypotheses/v1",
+  "hypotheses": [
+    {
+      "claim": "Can frontend reach protected canary?",
+      "reason": "Test reachability",
+      "evidence_ids": [
+        "E-NET"
+      ],
+      "check": "verify-lab-reachability",
+      "state": "hypothesis",
+      "executable": false
+    },
+    {
+      "claim": "Can service account read allowed ConfigMap?",
+      "reason": "Review scoped RBAC",
+      "evidence_ids": [
+        "E-RBAC"
+      ],
+      "check": "review-rbac",
+      "state": "hypothesis",
+      "executable": false
+    }
+  ]
+}
