@@ -1,0 +1,10 @@
+{
+  "NET-01": "vulnerable",
+  "NET-02": "not-vulnerable",
+  "RBAC-01": "vulnerable",
+  "RBAC-02": "not-vulnerable",
+  "TLS-01": "unknown",
+  "TLS-02": "unknown",
+  "APP-01": "unknown",
+  "APP-02": "unknown"
+}
