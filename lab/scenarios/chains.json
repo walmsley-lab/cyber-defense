@@ -1,0 +1,80 @@
+{
+  "environment": "k8s-synthetic-chain-lab",
+  "assets": [
+    {
+      "id": "outside",
+      "kind": "network"
+    },
+    {
+      "id": "gateway",
+      "kind": "workload"
+    },
+    {
+      "id": "workload-identity",
+      "kind": "service-account"
+    },
+    {
+      "id": "read-role",
+      "kind": "role"
+    },
+    {
+      "id": "canary",
+      "kind": "data",
+      "protected": true
+    },
+    {
+      "id": "isolated-service",
+      "kind": "workload"
+    },
+    {
+      "id": "isolated-canary",
+      "kind": "data",
+      "protected": true
+    }
+  ],
+  "entrypoints": [
+    "outside"
+  ],
+  "relationships": [
+    {
+      "from": "outside",
+      "to": "gateway",
+      "type": "network",
+      "state": "configuration-supported",
+      "rationale": "Test ingress is configured as externally reachable",
+      "source": "service-config"
+    },
+    {
+      "from": "gateway",
+      "to": "workload-identity",
+      "type": "identity",
+      "state": "configuration-supported",
+      "rationale": "Workload runs with the identity",
+      "source": "pod-spec"
+    },
+    {
+      "from": "workload-identity",
+      "to": "read-role",
+      "type": "permission",
+      "state": "configuration-supported",
+      "rationale": "Synthetic role binding grants permission",
+      "source": "role-binding"
+    },
+    {
+      "from": "read-role",
+      "to": "canary",
+      "type": "asset-access",
+      "state": "hypothesis",
+      "rationale": "Whether sensitive canary access actually succeeds is untested",
+      "source": "simulated-authorization"
+    },
+    {
+      "from": "isolated-service",
+      "to": "isolated-canary",
+      "type": "network",
+      "state": "hypothesis",
+      "rationale": "Disconnected branch must not be reported as reachable",
+      "source": "fixture"
+    }
+  ]
+}
