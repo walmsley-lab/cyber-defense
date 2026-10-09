@@ -19,6 +19,13 @@ def metadata(obj):
     return m.get("namespace", "default"), m.get("name", ""), m.get("labels", {})
 
 def permits(source, dest, policies, namespaces):
+    """Classify source->dest ingress as 'allowed', 'denied' or 'indeterminate'.
+
+    Unmodeled policy constructs (port-scoped rules, ipBlock peers) are reported
+    as 'indeterminate' rather than dropped: for a path finder, silently removing
+    a possibly-real edge is a false negative, the dangerous direction. A bounded
+    probe is what promotes an indeterminate edge to observed or prunes it.
+    """
     d_ns, _, d_labels = metadata(dest)
     s_ns, _, s_labels = metadata(source)
     relevant = []
@@ -29,15 +36,20 @@ def permits(source, dest, policies, namespaces):
         if p_ns == d_ns and "Ingress" in types and labels_match(d_labels, spec.get("podSelector", {}).get("matchLabels", {})):
             relevant.append(spec)
     if not relevant:
-        return True
+        return "allowed"
+    indeterminate = False
     for spec in relevant:
         for rule in spec.get("ingress", []):
-            if "ports" in rule:
-                continue  # Can't establish reachability without matching a port.
-            if "from" not in rule:
-                return True
+            port_scoped = "ports" in rule  # We don't model ports; can't confirm the service port.
+            if "from" not in rule:  # Allow from all sources.
+                if port_scoped:
+                    indeterminate = True
+                    continue
+                return "allowed"
+            matched = False
             for peer in rule["from"]:
                 if "ipBlock" in peer:
+                    indeterminate = True  # Source is a pod, not a CIDR we can evaluate.
                     continue
                 if "namespaceSelector" in peer:
                     wanted_ns = peer["namespaceSelector"].get("matchLabels", {})
@@ -47,8 +59,14 @@ def permits(source, dest, policies, namespaces):
                     continue
                 if "podSelector" in peer and not labels_match(s_labels, peer["podSelector"].get("matchLabels", {})):
                     continue
-                return True
-    return False
+                matched = True
+                break
+            if matched:
+                if port_scoped:
+                    indeterminate = True
+                else:
+                    return "allowed"
+    return "indeterminate" if indeterminate else "denied"
 
 def analyze(snapshot):
     pods = snapshot.get("pods", {}).get("items", [])
@@ -80,10 +98,15 @@ def analyze(snapshot):
                 source_key = "pod:%s/%s" % metadata(source)[:2]
                 if source_key == target_key:
                     continue
-                if permits(source, target, policies, namespaces):
-                    edges.append({"from": source_key, "to": f"svc:{ns}/{name}",
-                                  "relation": "POTENTIAL_REACHABILITY",
-                                  "evidence": "simplified-ingress-policy"})
+                verdict = permits(source, target, policies, namespaces)
+                if verdict == "denied":
+                    continue
+                edges.append({"from": source_key, "to": f"svc:{ns}/{name}",
+                              "relation": "POTENTIAL_REACHABILITY",
+                              "evidence": "simplified-ingress-policy",
+                              "confidence": "indeterminate" if verdict == "indeterminate"
+                                            else "configuration-supported"})
+    edge_conf = {(e["from"], e["to"]): e.get("confidence", "configuration-supported") for e in edges}
     adj = {n: [] for n in vertices}
     for e in edges:
         adj[e["from"]].append(e["to"])
@@ -96,8 +119,14 @@ def analyze(snapshot):
         while queue:
             current, path = queue.popleft()
             if len(path) > 1 and vertices[current].get("protected"):
+                confidence = "configuration-supported"
+                for a, b in zip(path, path[1:]):
+                    if edge_conf.get((a, b)) == "indeterminate":
+                        confidence = "indeterminate"
+                        break
                 paths.append({"from": start, "to": current, "nodes": path,
-                              "status": "hypothesis", "validated": False})
+                              "status": "hypothesis", "confidence": confidence,
+                              "validated": False})
                 continue
             for nxt in adj.get(current, []):
                 if nxt not in path:
@@ -105,6 +134,8 @@ def analyze(snapshot):
     return {"nodes": vertices, "edges": edges, "paths": paths,
             "limitations": ["Offline configuration reasoning only; no exploitation or packet tests.",
                             "Only simplified ingress policy matching; egress, ports, DNS, CNI behavior, service mesh and external firewalls are not modeled.",
+                            "Unmodeled constructs (port-scoped rules, ipBlock peers) yield 'indeterminate' edges/paths, not confirmed ones; a bounded probe must resolve them.",
+                            "Reads standard NetworkPolicy only; CiliumNetworkPolicy and other CNI-specific CRDs are not evaluated.",
                             "Potential paths are not proof of reachability or privilege escalation."]}
 
 def acquire():
