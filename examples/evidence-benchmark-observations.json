@@ -1,0 +1,68 @@
+{
+  "observations": [
+    {
+      "case_id": "NET-01",
+      "run_id": "demo-001",
+      "kind": "network",
+      "method": "network-canary",
+      "result": "vulnerable",
+      "evidence_ref": "runs/demo-001/net-exposed.json"
+    },
+    {
+      "case_id": "NET-02",
+      "run_id": "demo-001",
+      "kind": "network",
+      "method": "network-canary",
+      "result": "not-vulnerable",
+      "evidence_ref": "runs/demo-001/net-restricted.json"
+    },
+    {
+      "case_id": "RBAC-01",
+      "run_id": "demo-001",
+      "kind": "rbac",
+      "method": "rbac-review",
+      "result": "vulnerable",
+      "evidence_ref": "runs/demo-001/rbac-allowed.json"
+    },
+    {
+      "case_id": "RBAC-02",
+      "run_id": "demo-001",
+      "kind": "rbac",
+      "method": "rbac-review",
+      "result": "not-vulnerable",
+      "evidence_ref": "runs/demo-001/rbac-denied.json"
+    },
+    {
+      "case_id": "TLS-01",
+      "run_id": "demo-001",
+      "kind": "tls",
+      "method": "tls-inspection",
+      "result": "vulnerable",
+      "evidence_ref": "runs/demo-001/tls-legacy.json"
+    },
+    {
+      "case_id": "TLS-02",
+      "run_id": "demo-001",
+      "kind": "tls",
+      "method": "tls-inspection",
+      "result": "not-vulnerable",
+      "evidence_ref": "runs/demo-001/tls-secure.json"
+    },
+    {
+      "case_id": "APP-01",
+      "run_id": "demo-001",
+      "kind": "application-authz",
+      "method": "app-canary",
+      "result": "unknown",
+      "evidence_ref": "runs/demo-001/app-untested.json"
+    },
+    {
+      "case_id": "APP-02",
+      "run_id": "demo-001",
+      "kind": "application-authz",
+      "method": "app-canary",
+      "result": "unknown",
+      "evidence_ref": "runs/demo-001/app-untested.json"
+    }
+  ]
+}
