@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cyber-lab
+  labels:
+    app.kubernetes.io/part-of: cyber-defense
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lab-workloads
+  namespace: cyber-lab
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: cyber-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: frontend}
+  template:
+    metadata:
+      labels:
+        app: frontend
+        cyber-defense/entrypoint: "true"
+    spec:
+      serviceAccountName: lab-workloads
+      automountServiceAccountToken: false
+      containers:
+        - name: client
+          image: curlimages/curl:8.12.1
+          command: ["sh", "-c", "sleep 86400"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: {drop: ["ALL"]}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary
+  namespace: cyber-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: canary}
+  template:
+    metadata:
+      labels:
+        app: canary
+        cyber-defense/protected: "true"
+    spec:
+      serviceAccountName: lab-workloads
+      automountServiceAccountToken: false
+      containers:
+        - name: server
+          image: python:3.12-alpine
+          command: ["python", "-m", "http.server", "8080", "--bind", "0.0.0.0"]
+          ports: [{containerPort: 8080}]
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities: {drop: ["ALL"]}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary
+  namespace: cyber-lab
+spec:
+  selector: {app: canary}
+  ports: [{port: 8080, targetPort: 8080}]

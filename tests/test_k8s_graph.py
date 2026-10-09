@@ -25,6 +25,22 @@ class LabTest(unittest.TestCase):
         report = analyze(modified)
         self.assertFalse(any(p["to"] == "pod:internal/canary" for p in report["paths"]))
 
+    def test_port_scoped_rule_is_indeterminate_not_dropped(self):
+        # A port-scoped allow rule is a construct the engine does not fully model.
+        # The reachable path must still surface, marked indeterminate rather than dropped.
+        modified = deepcopy(self.snapshot)
+        modified["networkpolicies"]["items"] = [{
+          "metadata": {"namespace": "internal", "name": "allow-api-on-port"},
+          "spec": {"podSelector": {"matchLabels": {"app": "canary"}},
+                   "policyTypes": ["Ingress"],
+                   "ingress": [{"from": [{"podSelector": {"matchLabels": {"app": "api"}}}],
+                                "ports": [{"port": 8080}]}]}
+        }]
+        report = analyze(modified)
+        canary_paths = [p for p in report["paths"] if p["to"] == "pod:internal/canary"]
+        self.assertTrue(canary_paths)
+        self.assertTrue(all(p["confidence"] == "indeterminate" for p in canary_paths))
+
     def test_service_selector(self):
         self.snapshot["services"]["items"][1]["spec"]["selector"] = {"app":"not-present"}
         report = analyze(self.snapshot)

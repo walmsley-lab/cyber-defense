@@ -1,0 +1,11 @@
+# Applies ingress isolation to the canary; the frontend must not reach it.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: canary-deny-ingress
+  namespace: cyber-lab
+spec:
+  podSelector:
+    matchLabels: {app: canary}
+  policyTypes: [Ingress]
+  ingress: []

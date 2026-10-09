@@ -1,0 +1,3 @@
+# Remove the test-only deny policy to restore the intentionally exposed state.
+# This is not an apply-able NetworkPolicy manifest: use
+# kubectl -n cyber-lab delete networkpolicy canary-deny-ingress --ignore-not-found
