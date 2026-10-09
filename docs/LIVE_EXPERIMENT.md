@@ -28,3 +28,6 @@ The command checks the exact `kind-cyber-defense` current context, applies only 
 4. Verify observations truly come from the fixed lab targets and that positive, negative and inconclusive cases are distinguished.
 5. Never label the outcome as confirmed exploitation.
 6. Follow up by fixing identity alignment and adding an independent canary-based complete-chain test.
+
+## Identity alignment (follow-up)
+The frontend workload now uses the **same honeypot-reader service account** as the RBAC review, with token automount disabled. The read-only authorization review checks that principal directly. This aligns identity provenance, but it deliberately does **not** prove the frontend can obtain an API credential or exercise its permission. The network canary and ConfigMap authorization remain separate test resources. Do not claim end-to-end compromise.
