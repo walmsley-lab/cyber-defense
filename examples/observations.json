@@ -1,0 +1,13 @@
+{
+  "observations": [
+    {
+      "source": "pod:public/frontend",
+      "target": "pod:internal/canary",
+      "result": "reachable",
+      "method": "synthetic-canary-http",
+      "timestamp": "2026-10-09T20:00:00Z",
+      "context": "synthetic",
+      "http_status": 200
+    }
+  ]
+}
