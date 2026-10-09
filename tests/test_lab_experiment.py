@@ -29,7 +29,7 @@ class LabExperimentTests(unittest.TestCase):
             self.assertEqual(result["baseline_chain"]["state"],"both-prerequisites-observed")
             self.assertEqual(result["restricted_chain"]["state"],"prerequisite-denied")
             self.assertTrue((Path(tmp)/"new"/"report.json").exists())
-            self.assertTrue(any("restrict.yaml" in c for c in calls))
+            self.assertTrue(any("restrict.yaml" in " ".join(c) for c in calls))
     def test_refuse_unapproved_context(self):
         def command(argv,timeout=90):return SimpleNamespace(stdout="production-cluster\n")
         with tempfile.TemporaryDirectory() as tmp:
