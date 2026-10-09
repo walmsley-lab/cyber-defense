@@ -1,0 +1,16 @@
+{
+  "observations": [
+    {
+      "source_id": "E-NET",
+      "kind": "network",
+      "result": "reachable",
+      "context": "kind-cyber-defense"
+    },
+    {
+      "source_id": "E-RBAC",
+      "kind": "rbac",
+      "result": "denied",
+      "context": "kind-cyber-defense"
+    }
+  ]
+}
