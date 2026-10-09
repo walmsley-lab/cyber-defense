@@ -1,0 +1,81 @@
+{
+  "name": "synthetic-k8s-assessment",
+  "actions": [
+    {
+      "id": "inventory",
+      "title": "Inventory scoped lab workloads",
+      "impact": 2,
+      "confidence": 1,
+      "information_gain": 2,
+      "cost": 1
+    },
+    {
+      "id": "network",
+      "title": "Check canary reachability",
+      "requires_all": [
+        "inventory"
+      ],
+      "impact": 4,
+      "confidence": 0.8,
+      "information_gain": 2,
+      "cost": 1
+    },
+    {
+      "id": "rbac",
+      "title": "Review service-account authorization",
+      "requires_all": [
+        "inventory"
+      ],
+      "impact": 4,
+      "confidence": 0.8,
+      "information_gain": 2,
+      "cost": 1
+    },
+    {
+      "id": "policy",
+      "title": "Inspect network policy isolation",
+      "requires_all": [
+        "inventory"
+      ],
+      "impact": 3,
+      "confidence": 0.9,
+      "information_gain": 1,
+      "cost": 1
+    },
+    {
+      "id": "correlate",
+      "title": "Correlate exposure and authorization evidence",
+      "requires_all": [
+        "network",
+        "rbac"
+      ],
+      "impact": 5,
+      "confidence": 0.8,
+      "information_gain": 2,
+      "cost": 1
+    },
+    {
+      "id": "alternate",
+      "title": "Investigate alternative permitted route",
+      "requires_any": [
+        "network",
+        "policy"
+      ],
+      "impact": 3,
+      "confidence": 0.6,
+      "information_gain": 2,
+      "cost": 2
+    },
+    {
+      "id": "report",
+      "title": "Produce evidence-backed lab finding",
+      "requires_all": [
+        "correlate"
+      ],
+      "impact": 5,
+      "confidence": 1,
+      "information_gain": 1,
+      "cost": 1
+    }
+  ]
+}
