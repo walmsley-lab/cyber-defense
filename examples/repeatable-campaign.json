@@ -1,0 +1,55 @@
+{
+  "name": "repeatable-synthetic-checks",
+  "actions": [
+    {
+      "id": "inventory",
+      "title": "Inventory canary",
+      "impact": 2,
+      "check": {
+        "kind": "fixture-equals",
+        "key": "inventory_present",
+        "equals": true
+      }
+    },
+    {
+      "id": "network",
+      "title": "Check allowed canary reachability",
+      "requires_all": [
+        "inventory"
+      ],
+      "impact": 4,
+      "check": {
+        "kind": "fixture-equals",
+        "key": "canary_reachable",
+        "equals": true
+      }
+    },
+    {
+      "id": "rbac",
+      "title": "Check canary read authorization",
+      "requires_all": [
+        "inventory"
+      ],
+      "impact": 4,
+      "check": {
+        "kind": "fixture-equals",
+        "key": "canary_authorized",
+        "equals": true
+      }
+    },
+    {
+      "id": "report",
+      "title": "Confirm evidence prerequisites",
+      "requires_all": [
+        "network",
+        "rbac"
+      ],
+      "impact": 5,
+      "check": {
+        "kind": "fixture-equals",
+        "key": "evidence_complete",
+        "equals": true
+      }
+    }
+  ]
+}
