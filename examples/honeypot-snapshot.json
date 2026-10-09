@@ -1,0 +1,73 @@
+{
+  "pods": {
+    "items": [
+      {
+        "kind": "Pod",
+        "metadata": {
+          "name": "frontend",
+          "namespace": "cyber-lab",
+          "labels": {
+            "cyber-defense/entrypoint": "true"
+          }
+        },
+        "spec": {
+          "serviceAccountName": "honeypot-reader",
+          "automountServiceAccountToken": true
+        }
+      }
+    ]
+  },
+  "roles": {
+    "items": [
+      {
+        "kind": "Role",
+        "metadata": {
+          "name": "canary-reader",
+          "namespace": "cyber-lab"
+        },
+        "rules": [
+          {
+            "apiGroups": [
+              ""
+            ],
+            "resources": [
+              "secrets"
+            ],
+            "verbs": [
+              "get"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "clusterroles": {
+    "items": []
+  },
+  "rolebindings": {
+    "items": [
+      {
+        "kind": "RoleBinding",
+        "metadata": {
+          "name": "canary-reader-binding",
+          "namespace": "cyber-lab"
+        },
+        "subjects": [
+          {
+            "kind": "ServiceAccount",
+            "name": "honeypot-reader",
+            "namespace": "cyber-lab"
+          }
+        ],
+        "roleRef": {
+          "kind": "Role",
+          "name": "canary-reader",
+          "apiGroup": "rbac.authorization.k8s.io"
+        }
+      }
+    ]
+  },
+  "clusterrolebindings": {
+    "items": []
+  }
+}
