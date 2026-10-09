@@ -13,7 +13,7 @@ class BenchmarkTests(unittest.TestCase):
   self.assertEqual(s["totals"]["fp"],1)
   self.assertEqual(s["totals"]["fn"],1)
  def test_abstain_is_not_failure(self):
-  s=score(CASES,{"a":"unknown"})
+  s=score(CASES,{"a":"unknown","b":"not-vulnerable"})
   self.assertEqual(s["totals"]["abstain"],1)
   self.assertEqual(s["coverage"],0.5)
  def test_unknown_case_rejected(self):
