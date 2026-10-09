@@ -1,0 +1,40 @@
+# Synthetic authorization canary; no real Secret values or privileges.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: honeypot-reader
+  namespace: cyber-lab
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: honeypot-canary-reader
+  namespace: cyber-lab
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["honeypot-canary"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: honeypot-canary-reader
+  namespace: cyber-lab
+subjects:
+  - kind: ServiceAccount
+    name: honeypot-reader
+    namespace: cyber-lab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: honeypot-canary-reader
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: honeypot-canary
+  namespace: cyber-lab
+data:
+  marker: synthetic-test-only
