@@ -1,0 +1,84 @@
+{
+  "namespaces": {
+    "items": [
+      {
+        "metadata": {
+          "name": "public",
+          "labels": {
+            "tier": "public"
+          }
+        }
+      },
+      {
+        "metadata": {
+          "name": "internal",
+          "labels": {
+            "tier": "internal"
+          }
+        }
+      }
+    ]
+  },
+  "pods": {
+    "items": [
+      {
+        "metadata": {
+          "namespace": "public",
+          "name": "frontend",
+          "labels": {
+            "app": "frontend",
+            "cyber-defense/entrypoint": "true"
+          }
+        }
+      },
+      {
+        "metadata": {
+          "namespace": "internal",
+          "name": "api",
+          "labels": {
+            "app": "api"
+          }
+        }
+      },
+      {
+        "metadata": {
+          "namespace": "internal",
+          "name": "canary",
+          "labels": {
+            "app": "canary",
+            "cyber-defense/protected": "true"
+          }
+        }
+      }
+    ]
+  },
+  "services": {
+    "items": [
+      {
+        "metadata": {
+          "namespace": "internal",
+          "name": "api"
+        },
+        "spec": {
+          "selector": {
+            "app": "api"
+          }
+        }
+      },
+      {
+        "metadata": {
+          "namespace": "internal",
+          "name": "canary"
+        },
+        "spec": {
+          "selector": {
+            "app": "canary"
+          }
+        }
+      }
+    ]
+  },
+  "networkpolicies": {
+    "items": []
+  }
+}
