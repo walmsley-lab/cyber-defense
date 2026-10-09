@@ -1,0 +1,61 @@
+{
+  "name": "owned-lab-security-relationships-v1",
+  "cases": [
+    {
+      "id": "NET-01",
+      "scenario": "Exposed canary",
+      "category": "network",
+      "expected": "vulnerable",
+      "oracle": "isolated CNI reachability from test client"
+    },
+    {
+      "id": "NET-02",
+      "scenario": "Isolated canary",
+      "category": "network",
+      "expected": "not-vulnerable",
+      "oracle": "blocked CNI reachability from test client"
+    },
+    {
+      "id": "RBAC-01",
+      "scenario": "Overbroad canary grant",
+      "category": "rbac",
+      "expected": "vulnerable",
+      "oracle": "access review for specific test principal/resource"
+    },
+    {
+      "id": "RBAC-02",
+      "scenario": "No canary grant",
+      "category": "rbac",
+      "expected": "not-vulnerable",
+      "oracle": "denied authorization review"
+    },
+    {
+      "id": "TLS-01",
+      "scenario": "Synthetic legacy protocol",
+      "category": "tls",
+      "expected": "vulnerable",
+      "oracle": "verified negotiated protocol"
+    },
+    {
+      "id": "TLS-02",
+      "scenario": "Synthetic secure transport",
+      "category": "tls",
+      "expected": "not-vulnerable",
+      "oracle": "verified transport policy"
+    },
+    {
+      "id": "APP-01",
+      "scenario": "Synthetic unprotected test endpoint",
+      "category": "application-authz",
+      "expected": "vulnerable",
+      "oracle": "authorized canary test request"
+    },
+    {
+      "id": "APP-02",
+      "scenario": "Synthetic protected test endpoint",
+      "category": "application-authz",
+      "expected": "not-vulnerable",
+      "oracle": "authorized canary test request"
+    }
+  ]
+}
