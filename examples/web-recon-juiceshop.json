@@ -1,0 +1,24 @@
+{
+  "tls_observations": [
+    {
+      "id": "http://2iogou5iqtcbn5ogt624qi9t10.ingress.cpu.phl.aes.akash.pub/",
+      "source": "http://2iogou5iqtcbn5ogt624qi9t10.ingress.cpu.phl.aes.akash.pub/",
+      "redirect_http_to_https": false,
+      "hsts": false,
+      "min_tls": "none-plaintext-http"
+    }
+  ],
+  "web_observations": [
+    {
+      "id": "http://2iogou5iqtcbn5ogt624qi9t10.ingress.cpu.phl.aes.akash.pub/",
+      "source": "http://2iogou5iqtcbn5ogt624qi9t10.ingress.cpu.phl.aes.akash.pub/",
+      "status": 200,
+      "headers": {
+        "server": "nginx",
+        "access-control-allow-origin": "*",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN"
+      }
+    }
+  ]
+}

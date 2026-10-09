@@ -1,4 +1,4 @@
-"""Offline defensive discovery over supplied inventories, TLS facts, SSH configs and OSV records."""
+"""Offline defensive discovery over supplied inventories, TLS facts, SSH configs, HTTP response metadata and OSV records."""
 import argparse
 import json
 from pathlib import Path
@@ -31,6 +31,21 @@ def discover(data):
             emit("TLS-HSTS",asset,"HSTS absent",{"source":endpoint.get("source")})
         if endpoint.get("min_tls") in ("TLSv1","TLSv1.0","TLSv1.1"):
             emit("TLS-LEGACY",asset,"Legacy TLS protocol observed",{"min_tls":endpoint.get("min_tls")})
+    for web in data.get("web_observations",[]):
+        asset=web.get("id","unknown")
+        headers={str(k).lower():str(v) for k,v in web.get("headers",{}).items()}
+        src=web.get("source")
+        if "content-security-policy" not in headers:
+            emit("WEB-CSP",asset,"No Content-Security-Policy header observed",{"source":src})
+        if "x-frame-options" not in headers and "content-security-policy" not in headers:
+            emit("WEB-FRAME",asset,"No clickjacking protection (X-Frame-Options / CSP frame-ancestors) observed",{"source":src})
+        if headers.get("x-content-type-options","").lower()!="nosniff":
+            emit("WEB-NOSNIFF",asset,"X-Content-Type-Options not set to nosniff",{"source":src})
+        if headers.get("access-control-allow-origin")=="*":
+            emit("WEB-CORS-WILDCARD",asset,"Access-Control-Allow-Origin wildcard; reachability of credentialed endpoints not evaluated",
+                 {"source":src,"value":"*"})
+        if "server" in headers:
+            emit("WEB-BANNER",asset,"Server banner discloses software",{"source":src,"server":headers.get("server")},"informational")
     for server in data.get("ssh_configurations",[]):
         asset=server.get("id","unknown")
         options={str(k).lower():str(v).lower() for k,v in server.get("options",{}).items()}
